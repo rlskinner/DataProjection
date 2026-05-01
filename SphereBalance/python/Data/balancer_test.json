@@ -1,0 +1,5 @@
+{
+  "balance_method": "bogus",
+  "max_iterations": 42,
+  "tolerance": 1e-04
+}
