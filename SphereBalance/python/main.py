@@ -1,8 +1,8 @@
 import argparse
 import numpy as np
 
-from DataPoint import DataPoint
-from DataSet import DataSet
+from SpherePoint import SpherePoint
+from SpherePointSet import SpherePointSet
 
 
 def parse_args():
@@ -23,11 +23,11 @@ def main():
     if args.projectionConfig is not None:
         print(f"Projection config: {args.projectionConfig}")
 
-    ds = DataSet()
-    print(ds)
-    ds.add_data_point(DataPoint(np.array([1.0, 2.0, 3.0]), 0.5))
-    ds.add_data_point(DataPoint(np.array([3.0, 4.0, 5.0]), 0.75))
-    ds.add_data_point(DataPoint(np.array([3.0, 4.0, 5.0]), 0.25))
+    ds = SpherePointSet([
+        SpherePoint(np.array([1.0, 2.0, 3.0]), 0.5),
+        SpherePoint(np.array([3.0, 4.0, 5.0]), 0.75),
+        SpherePoint(np.array([3.0, 4.0, 5.0]), 0.25),
+    ])
     print(ds)
     
 

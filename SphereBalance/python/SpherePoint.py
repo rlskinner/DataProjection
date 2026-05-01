@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class DataPoint:
+class SpherePoint:
     def __init__(self, position: np.ndarray, fitness: float):
         if not isinstance(position, np.ndarray):
             raise TypeError("position must be a numpy ndarray")
@@ -12,7 +12,7 @@ class DataPoint:
         self.fitness = float(fitness)
 
     def __repr__(self):
-        return f"DataPoint(position={self.position}, fitness={self.fitness})"
+        return f"SpherePoint(position={self.position}, fitness={self.fitness})"
     
-    def DataPoint(self, position: np.ndarray, fitness: float):
-        return DataPoint(position, fitness)
+    def SpherePoint(self, position: np.ndarray, fitness: float):
+        return SpherePoint(position, fitness)
