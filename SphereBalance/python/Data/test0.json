@@ -1,0 +1,28 @@
+{
+  "sphere_points": [
+    {
+      "position": [
+        1,
+        2,
+        3
+      ],
+      "fitness": 0.5
+    },
+    {
+      "position": [
+        4,
+        5,
+        6
+      ],
+      "fitness": 0.75
+    },
+    {
+      "position": [
+        4,
+        5,
+        6
+      ],
+      "fitness": 0.25
+    }
+  ]
+}

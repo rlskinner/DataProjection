@@ -8,7 +8,11 @@ class SpherePoint:
         if position.shape != (3,):
             raise ValueError("position must be a 3D numpy vector")
 
-        self.position = position
+        # Normalize positionto lie on the sphere
+        norm = np.linalg.norm(position)
+        if norm == 0:
+            raise ValueError("position vector cannot be zero length")   
+        self.position = position / norm
         self.fitness = float(fitness)
 
     def __repr__(self):
@@ -16,3 +20,19 @@ class SpherePoint:
     
     def SpherePoint(self, position: np.ndarray, fitness: float):
         return SpherePoint(position, fitness)
+
+    # JSON serialization method
+    def to_dict(self):
+        return {
+            "position": self.position.tolist(),
+            "fitness": self.fitness
+        }
+    
+    # JSON deserialization method
+    @staticmethod
+    def from_dict(data):
+        position = np.array(data["position"])
+        fitness = float(data["fitness"])
+        return SpherePoint(position, fitness)
+    
+    

@@ -1,3 +1,4 @@
+import json
 import numpy as np
 
 from SpherePoint import SpherePoint
@@ -33,5 +34,39 @@ class SpherePointSet:
             return self.sphere_points[index]
         else:
             raise IndexError("Index out of bounds")
+        
+    # To JSON string
+    def to_json(self):
+        return json.dumps(self.to_dict(), indent=2)
+    
+    # To JSON file
+    def to_json_file(self, filename):
+        with open(filename, 'w') as f:
+            json.dump(self.to_dict(), f, indent=2)
+
+    # Static method to create from JSON string
+    @staticmethod
+    def from_json(json_str):
+        data = json.loads(json_str)
+        return SpherePointSet.from_dict(data)
+    
+    # Static method to create from JSON file
+    @staticmethod
+    def from_json_file(filename):
+        with open(filename, 'r') as f:
+            data = json.load(f)
+        return SpherePointSet.from_dict(data)
+    
+    # JSON serialization method
+    def to_dict(self):
+        return {
+            "sphere_points": [point.to_dict() for point in self.sphere_points]
+        }
+
+    # JSON deserialization method
+    @staticmethod   
+    def from_dict(data):
+        points = [SpherePoint.from_dict(point_data) for point_data in data["sphere_points"]]
+        return SpherePointSet(points)       
         
     
