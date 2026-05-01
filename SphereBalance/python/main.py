@@ -20,27 +20,11 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print(f"Filename: {args.filename}")
-    if args.projectionConfig is not None:
-        print(f"Projection config: {args.projectionConfig}")
 
-    points = [
-        SpherePoint(np.array([1.0, 2.0, 3.0]), 0.5),
-        SpherePoint(np.array([3.0, 4.0, 5.0]), 0.75),
-        SpherePoint(np.array([3.0, 4.0, 5.0]), 0.25),
-    ]
-    ds = SpherePointSet(points)
-    print(ds)
-    
-    # Test JSON serialization
-    ds_json = ds.to_json()
-    print("Serialized SpherePointSet to JSON:")
-    print(ds_json)
-
-    # Test JSON deserialization 
-    ds_from_json = SpherePointSet.from_json_file(args.filename)
-    print("Deserialized SpherePointSet from JSON:") 
-    print(ds_from_json.to_json())
+    # Load the data set from the specified JSON file 
+    ds = SpherePointSet.from_json_file(args.filename)
+    print("Initial data set:") 
+    print(ds.to_json())
 
 if __name__ == "__main__":
     main()

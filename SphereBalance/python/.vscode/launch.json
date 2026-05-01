@@ -7,7 +7,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
       "console": "integratedTerminal",
-      "args": ["Data/test0.json"],
+      "args": ["Data/2pts.json"],
       "justMyCode": true
     }
   ]
