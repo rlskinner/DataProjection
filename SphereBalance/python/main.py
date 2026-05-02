@@ -22,21 +22,27 @@ def parse_args():
 def main():
     args = parse_args()
 
+    # Load the data set from the specified JSON file 
+    ds = SpherePointSet.from_json_file(args.filename)
+    # print("Initial data set:") 
+    # print(ds.to_json())
+
     balancer = SphereBalancerConfig()
-    print("default balancer")
-    print(balancer.to_json())
-    print(f"tolerance: {balancer.tolerance()}")
+    # print("default balancer")
+    # print(balancer.to_json())
+    # print(f"tolerance: {balancer.tolerance()}")
 
     if args.balancerConfigPath is not None:
         balancer = SphereBalancerConfig.from_json_file(args.balancerConfigPath)
-        print("Configured balancer")
-        print(balancer.to_json())
-        print(f"tolerance: {balancer.tolerance()}")
+        # print("Configured balancer")
+        # print(balancer.to_json())
+        # print(f"tolerance: {balancer.tolerance()}")
 
-    # Load the data set from the specified JSON file 
-    ds = SpherePointSet.from_json_file(args.filename)
-    print("Initial data set:") 
-    print(ds.to_json())
+    balancer = SphereBalancer(ds, balancer)
+    print("Balancer initialized")
+
+    while balancer.next():
+        pass
 
 if __name__ == "__main__":
     main()
