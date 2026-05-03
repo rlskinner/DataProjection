@@ -104,40 +104,34 @@ class SphereBalancer:
         p_i = self.sphere_point_set.get_data_point(i)
         p_j = self.sphere_point_set.get_data_point(j)
 
-        p_i_j_normal = np.cross(p_i.position, p_j.position)
-        print(f"p_i_j_normal: {p_i_j_normal}")
-
-        # find length of the arc between p_i and p_j and normalize
-        normal_length = np.linalg.norm(p_i_j_normal)
-        print(f"normal_length: {normal_length}")
+        # Angle (arc length) between the points -> displacement arc length
         arc_length = np.arccos(np.clip(np.dot(p_i.position, p_j.position), -1.0, 1.0))
-        print(f"arc_length: {arc_length}")
-        # 
-        # arc_length = np.arccos(np.clip(np.dot(p_i.position, p_j.position), -1.0, 1.0))
-        
         arc_displacement = (math.pi - arc_length) / 2
-        print(f"arc_displacement: {arc_displacement}")  
+        # print(f"arc_length: {arc_length}")
+        # print(f"arc_displacement: {arc_displacement}")  
 
-        # The i and j displacement directions are perpindicular to the nomrla vector
-        p_i_j_normal /= normal_length  # Normalize the normal vector
-        print(f"normalized p_i_j_normal: {p_i_j_normal}")
-                
+        # Normal vector p_i x p_j
+        p_i_j_normal = np.cross(p_i.position, p_j.position)
+        p_i_j_normal /= np.linalg.norm(p_i_j_normal)
+        # print(f"normalized p_i_j_normal: {p_i_j_normal}")
+
+        # The i and j displacement directions are perpindicular to the normal vector
         p_i_displacement_direction = np.cross(p_i.position, p_i_j_normal)
         p_j_displacement_direction = np.cross(p_i_j_normal, p_j.position)
-        print(f"p_i_displacement_direction: {p_i_displacement_direction}")
-        print(f"p_j_displacement_direction: {p_j_displacement_direction}")  
+        # print(f"p_i_displacement_direction: {p_i_displacement_direction}")
+        # print(f"p_j_displacement_direction: {p_j_displacement_direction}")  
 
-        # The displacement magnitude directions are normal vectors
-        # scale each by the arc displacement
+        # The displacement directions are normal vectors,
+        # so the displacements are scaled by the arc displacement
         p_i_displacement = arc_displacement * p_i_displacement_direction
         p_j_displacement = arc_displacement * p_j_displacement_direction
-        print(f"p_i_displacement: {p_i_displacement}")
-        print(f"p_j_displacement: {p_j_displacement}")
+        # print(f"p_i_displacement: {p_i_displacement}")
+        # print(f"p_j_displacement: {p_j_displacement}")
 
+        # Accumulate the pairwise displacements
         self.position_displacements[i] += p_i_displacement
         self.position_displacements[j] += p_j_displacement
         
-
 
         # # Interesting.  The following was auto-suggested.  
         # # Compute the difference in fitness
