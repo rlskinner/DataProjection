@@ -3,12 +3,17 @@
     {
       "name": "+X",
       "position": [ 1, 0, 0 ],
-      "fitness": 0.5
+      "fitness": 1.0
     },
     {
       "name": "+Y",
       "position": [ 0, 1, 0 ],
-      "fitness": 0.75
+      "fitness": 1.0
+    },
+    {
+      "name": "+Z",
+      "position": [ 0, 0, 1 ],
+      "fitness": 1.0
     }
   ]
 }

@@ -7,7 +7,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
       "console": "integratedTerminal",
-      "args": ["--balancer", "Data/balancer_test.json", "Data/2pts.json"],
+      "args": ["Data/3pts.json"],
       "justMyCode": true
     }
   ]

@@ -2,30 +2,32 @@ import numpy as np
 
 
 class SpherePoint:
-    def __init__(self, position: np.ndarray, fitness: float):
+    def __init__(self, position: np.ndarray, fitness: float, name: str = None):
         if not isinstance(position, np.ndarray):
             raise TypeError("position must be a numpy ndarray")
         if position.shape != (3,):
             raise ValueError("position must be a 3D numpy vector")
 
-        # Normalize positionto lie on the sphere
+        # Normalize position to lie on the sphere
         norm = np.linalg.norm(position)
         if norm == 0:
             raise ValueError("position vector cannot be zero length")   
         self.position = position / norm
         self.fitness = float(fitness)
+        self.name = name  # Optional name for the point
 
     def __repr__(self):
-        return f"SpherePoint(position={self.position}, fitness={self.fitness})"
-    
-    def SpherePoint(self, position: np.ndarray, fitness: float):
-        return SpherePoint(position, fitness)
+        return f"SpherePoint(position={self.position}, fitness={self.fitness}, name={self.name})"
+
+    def SpherePoint(self, position: np.ndarray, fitness: float, name: str = None):
+        return SpherePoint(position, fitness, name)
 
     # JSON serialization method
     def to_dict(self):
         return {
             "position": self.position.tolist(),
-            "fitness": self.fitness
+            "fitness": self.fitness,
+            "name": self.name,
         }
     
     # JSON deserialization method
@@ -33,6 +35,6 @@ class SpherePoint:
     def from_dict(data):
         position = np.array(data["position"])
         fitness = float(data["fitness"])
-        return SpherePoint(position, fitness)
-    
+        name = data.get("name")
+        return SpherePoint(position, fitness, name)
     

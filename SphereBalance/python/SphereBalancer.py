@@ -9,7 +9,8 @@ class SphereBalancerConfig:
         self.dict = {
             "balance_method": "equalize_fitness",
             "max_iterations": 100,
-            "tolerance": 1e-5
+            "tolerance": 1e-5,
+            "iteration_displacement_scale": 0.1
         }
 
     def max_iterations(self):
@@ -20,6 +21,9 @@ class SphereBalancerConfig:
     
     def tolerance(self):
         return self.dict.get("tolerance")
+    
+    def iteration_displacement_scale(self):
+        return self.dict.get("iteration_displacement_scale")
 
     # JSON serialization method
     def to_dict(self):
@@ -89,14 +93,15 @@ class SphereBalancer:
                 self.find_displacements_to_balance_pair(i, j)
 
         # Scale the displacements and apply to the positions and normalize back to the sphere
-        scale = 0.1  # This could be a parameter in the config
+        scale = self.cfg.iteration_displacement_scale()
         for i in range(self.sphere_point_set.num_data_points()):
             displacement = self.position_displacements[i] * scale
             self.max_displacement = max(self.max_displacement, np.linalg.norm(displacement))
             self.sphere_point_set.get_data_point(i).position += displacement
+
             # Normalize the position back to the sphere
             self.sphere_point_set.get_data_point(i).position /= np.linalg.norm(self.sphere_point_set.get_data_point(i).position)
-            print(f"new position for point {i}: {self.sphere_point_set.get_data_point(i).position}")
+            print(f"new position for point {i}: {self.sphere_point_set.get_data_point(i).position}, ({self.sphere_point_set.get_data_point(i).name})")
         
         return self.max_displacement > self.tolerance() 
 
