@@ -110,6 +110,7 @@ class SphereBalancer:
         p_j = self.sphere_point_set.get_data_point(j)
 
         # Angle (arc length) between the points -> displacement arc length
+        # fitness is ignored for now.  It could be used to scale the arc displacement differently for p_i and p_j
         arc_length = np.arccos(np.clip(np.dot(p_i.position, p_j.position), -1.0, 1.0))
         arc_displacement = (math.pi - arc_length) / 2
         # print(f"arc_length: {arc_length}")

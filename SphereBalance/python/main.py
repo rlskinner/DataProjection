@@ -5,7 +5,7 @@ import json
 from SpherePoint import SpherePoint
 from SpherePointSet import SpherePointSet
 from SphereBalancer import SphereBalancer, SphereBalancerConfig
-
+from SphereViewer import SphereViewer
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Process a filename and optional balancer config.")
@@ -43,6 +43,9 @@ def main():
 
     while balancer.next():
         pass
+
+    sv = SphereViewer()
+    sv.run()
 
 if __name__ == "__main__":
     main()
