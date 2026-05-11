@@ -8,7 +8,7 @@
       "program": "${workspaceFolder}/main.py",
       "console": "integratedTerminal",
       "args": ["Data/3pts.json"],
-      "justMyCode": true
+      "justMyCode": false
     }
   ]
 }
