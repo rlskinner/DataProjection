@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 import json
+import pyqtgraph as pg
 
 from SpherePoint import SpherePoint
 from SpherePointSet import SpherePointSet
@@ -44,8 +45,15 @@ def main():
     while balancer.next():
         pass
 
+    
+    """Run the viewer as a standalone application"""
+    app = pg.mkQApp("Sphere Points App")
     sv = SphereViewer()
-    sv.run()
-
+    sv.setModel(ds)
+    sv.show()
+    sv.setWindowTitle("Sphere Points Viewer")
+    # app.addWidget(sv)
+    pg.exec()
+    
 if __name__ == "__main__":
     main()
