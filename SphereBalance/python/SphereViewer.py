@@ -25,7 +25,7 @@ class SphereViewer(QAbstractItemView):
         self._glView.addItem(axis)
         
         # Add sphere wireframe
-        self._wireframe = SphereWireframeItem(latitude_steps=9, longitude_steps=12)
+        self._wireframe = SphereWireframeItem()
         self._glView.addItem(self._wireframe)
         
         if model:
@@ -139,8 +139,8 @@ class SphereViewer(QAbstractItemView):
         
         # Create scatter plot item for this point
         positions = np.array([point.position], dtype=np.float32)
-        size = 5
-        color = (1.0, 0.0, 0.0, 1.0)  # Red by default
+        size = 0.1 # wish I knew what this size means
+        color = (1.0, 1.0, 0.0, 1.0)  # Yellow by default
         
         scatter = pgl.GLScatterPlotItem(
             pos=positions,
@@ -161,21 +161,57 @@ class SphereViewer(QAbstractItemView):
 
 
 class SphereWireframeItem(pgl.GLGraphicsItem.GLGraphicsItem):
-    def __init__(self,  parentItem: 'pgl.GLGraphicsItem.GLGraphicsItem' = None, latitude_steps=17, longitude_steps=4*9):
+    def __init__(self, 
+                 parentItem: 'pgl.GLGraphicsItem.GLGraphicsItem' = None,
+                 latitude_degree_increment=30,
+                 longitude_degree_increment=30,
+                 arc_degree_increment=5):
         super().__init__()
 
-        self.sphereMesh = np.zeros((latitude_steps, longitude_steps, 3), dtype=np.float32)
-        for i in range(latitude_steps):
-            lat = np.radians(i*180/(latitude_steps-1))
-            for j in range(longitude_steps):
-                lon = np.radians(j*360/longitude_steps)
-                x = np.cos(lon) * np.sin(lat)
-                y = np.sin(lon) * np.sin(lat)
-                z = np.cos(lat)
-                self.sphereMesh[i, j] = [x, y, z]
+        self._sphereLines = []
+        x = np.zeros((latitude_degree_increment, longitude_degree_increment, 3), dtype=np.float32)
+        # for each longitude
+        longitude = 0
+        longitude_line = 0
+        while longitude < 360:
+            self._sphereLines.append([])
+            latitude = 0
+            while latitude <= 180:
+                x, y, z = self.Latitude_Longitude_to_XYZ(latitude, longitude)
+                self._sphereLines[longitude_line].append([x, y, z])
+                latitude += arc_degree_increment
+            
+            longitude += longitude_degree_increment
+            longitude_line += 1
+
+        
+        latitude_line = longitude_line
+        latitude = latitude_degree_increment
+        while latitude <= 180-latitude_degree_increment:
+            self._sphereLines.append([])
+            longitude = 0
+            while longitude < 360:
+                x, y, z = self.Latitude_Longitude_to_XYZ(latitude, longitude)
+                self._sphereLines[latitude_line].append([x, y, z])
+                longitude += arc_degree_increment
+
+            # duplicate the first point to close the Latitude loop
+            self._sphereLines[latitude_line].append(self._sphereLines[latitude_line][0])
+
+            latitude += latitude_degree_increment
+            latitude_line += 1
+            
+
+    def Latitude_Longitude_to_XYZ(self, latitude, longitude):
+        lat = np.radians(latitude)
+        lon = np.radians(longitude)
+        x = np.cos(lon) * np.sin(lat)
+        y = np.sin(lon) * np.sin(lat)
+        z = np.cos(lat)
+        return x,y,z
+
 
                 # print(f"Vertex ({i}, {j}): {self.sphereMesh[i, j]}")
-        pass
 
     def paint(self):
         # Old OpenGL code is deprecated!
@@ -187,20 +223,20 @@ class SphereWireframeItem(pgl.GLGraphicsItem.GLGraphicsItem):
         ogl.glColor3f(0.0, 1.0, 1.0)  # cyan color
 
         # Draw latitude lines
-        for i in range(self.sphereMesh.shape[0]):
-            ogl.glBegin(ogl.GL_LINE_LOOP)
-            for j in range(self.sphereMesh.shape[1]):
-                v = self.sphereMesh[i, j]
-                ogl.glVertex3f(*self.sphereMesh[i, j])
+        for iLine in range(len(self._sphereLines)):
+            ogl.glBegin(ogl.GL_LINE_STRIP)
+            for iPoint in range(len(self._sphereLines[iLine])):
+                v = self._sphereLines[iLine][iPoint]
+                ogl.glVertex3f(*v)
             ogl.glEnd()
 
         # Draw longitude lines
-        for j in range(self.sphereMesh.shape[1]):
-            ogl.glBegin(ogl.GL_LINE_STRIP)
-            for i in range(self.sphereMesh.shape[0]):
-                v = self.sphereMesh[i, j]
-                ogl.glVertex3f(*v)
-            ogl.glEnd()
+#        for iPoint in range(self._sphereLines.shape[1]):
+#            ogl.glBegin(ogl.GL_LINE_STRIP)
+#            for i in range(self._sphereLines.shape[0]):
+#                v = self._sphereLines[i, iPoint]
+#                ogl.glVertex3f(*v)
+#            ogl.glEnd()
         
         self.update()
 

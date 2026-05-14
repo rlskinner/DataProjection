@@ -44,16 +44,13 @@ def main():
 
     while balancer.next():
         pass
-
-    
+   
     """Run the viewer as a standalone application"""
-    app = pg.mkQApp("Sphere Points App")
+    app = pg.mkQApp("Sphere Points")
     sv = SphereViewer()
     sv.setModel(ds)
-    sv.show()
-    sv.setWindowTitle("Sphere Points Viewer")
-    # app.addWidget(sv)
-    pg.exec()
+
+    app.exec()
     
 if __name__ == "__main__":
     main()
