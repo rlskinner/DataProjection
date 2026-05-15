@@ -11,11 +11,13 @@ from SpherePointSet import SpherePointSet
 class SphereViewer(QAbstractItemView):
     def __init__(self, parent: QWidget|None=None, model=None, *args, **kwargs):
         super().__init__(*args, parent, **kwargs)
-        
+
         self._model = None
         self._selected_indices = set()
         self._point_items = {}  # Maps model indices to GLScatterPlotItem
         
+        self._balancer = None
+   
         self._glView = pgl.GLViewWidget(rotationMethod='euler')
         self._glView.setCameraPosition(distance=3.0)
         self._glView.show()        
@@ -31,6 +33,9 @@ class SphereViewer(QAbstractItemView):
         if model:
             self.setModel(model)
     
+    def setBalancer(self, balancer):
+        self._balancer = balancer
+        
     # QAbstractItemView required methods
     def setModel(self, model):
         """Set the model for this view"""

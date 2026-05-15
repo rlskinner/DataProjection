@@ -23,32 +23,25 @@ def parse_args():
 def main():
     args = parse_args()
 
-    # Load the data set from the specified JSON file 
+    # Load data set from the specified JSON file 
     ds = SpherePointSet.from_json_file(args.filename)
-    # print("Initial data set:") 
-    # print(ds.to_json())
 
-    balancer = SphereBalancerConfig()
-    # print("default balancer")
-    # print(balancer.to_json())
-    # print(f"tolerance: {balancer.tolerance()}")
-
+    balancer_config = SphereBalancerConfig()
     if args.balancerConfigPath is not None:
-        balancer = SphereBalancerConfig.from_json_file(args.balancerConfigPath)
-        # print("Configured balancer")
-        # print(balancer.to_json())
-        # print(f"tolerance: {balancer.tolerance()}")
+        balancer_config = SphereBalancerConfig.from_json_file(args.balancerConfigPath)
+    # print("Configured balancer")
+    # print(balancer.to_json())
 
-    balancer = SphereBalancer(ds, balancer)
-    print("Balancer initialized")
+    balancer = SphereBalancer(balancer_config)
 
-    while balancer.next():
-        pass
+    # while balancer.next():
+        # pass
    
     """Run the viewer as a standalone application"""
     app = pg.mkQApp("Sphere Points")
     sv = SphereViewer()
     sv.setModel(ds)
+    sv.setBalancer(balancer)
 
     app.exec()
     

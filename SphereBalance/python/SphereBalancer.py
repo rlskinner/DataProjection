@@ -60,50 +60,48 @@ class SphereBalancerConfig:
 
 
 class SphereBalancer:
-    def __init__(self, sphere_point_set, balancer_config):
-        self.sphere_point_set = sphere_point_set
-        if balancer_config is not None:
-            self.cfg = balancer_config
-        else:
-            self.cfg = SphereBalancerConfig()
+    def __init__(self, config : SphereBalancerConfig=None):
+        self._config = SphereBalancerConfig() if config is None else config
+        self._sphere_point_set = None
+        self._position_displacements = None
+    
+    def setSpherePointSet(self, sphere_point_set : SpherePointSet=None):
+        self._sphere_point_set = sphere_point_set        
+        if self._sphere_point_set is not None:
 
-        # create scratch array of positions
-        self.position_displacements = [np.zeros(3) for _ in range(self.sphere_point_set.num_data_points())]
-        print("done")
-
-        self.max_displacement = 0.0
-
+            # create scratch array of positions
+            self._position_displacements = [np.zeros(3) for _ in range(self._sphere_point_set.num_data_points())]
 
     def max_iterations(self):
-        return self.cfg.max_iterations()
+        return self._config.max_iterations()
     
     def tolerance(self):
-        return self.cfg.tolerance()
+        return self._config.tolerance()
     
     def next(self):
         # Implementation for the next balancing step
 
         # Initialize
-        self.max_displacement = 0.0
-        for i in range(len(self.position_displacements)):
-            self.position_displacements[i].fill(0.0)
+        max_displacement = 0.0
+        for i in range(len(self._position_displacements)):
+            self._position_displacements[i].fill(0.0)
 
         for i in range(self.sphere_point_set.num_data_points()-1):
             for j in range(i+1, self.sphere_point_set.num_data_points()):
                 self.find_displacements_to_balance_pair(i, j)
 
         # Scale the displacements and apply to the positions and normalize back to the sphere
-        scale = self.cfg.iteration_displacement_scale()
+        scale = self._config.iteration_displacement_scale()
         for i in range(self.sphere_point_set.num_data_points()):
-            displacement = self.position_displacements[i] * scale
-            self.max_displacement = max(self.max_displacement, np.linalg.norm(displacement))
+            displacement = self._position_displacements[i] * scale
+            max_displacement = max(self._max_displacement, np.linalg.norm(displacement))
             self.sphere_point_set.get_data_point(i).position += displacement
 
             # Normalize the position back to the sphere
             self.sphere_point_set.get_data_point(i).position /= np.linalg.norm(self.sphere_point_set.get_data_point(i).position)
             print(f"new position for point {i}: {self.sphere_point_set.get_data_point(i).position}, ({self.sphere_point_set.get_data_point(i).name})")
         
-        return self.max_displacement > self.tolerance() 
+        return max_displacement > self.tolerance() 
 
     def find_displacements_to_balance_pair(self, i, j):
         p_i = self.sphere_point_set.get_data_point(i)
@@ -135,8 +133,8 @@ class SphereBalancer:
         # print(f"p_j_displacement: {p_j_displacement}")
 
         # Accumulate the pairwise displacements
-        self.position_displacements[i] += p_i_displacement
-        self.position_displacements[j] += p_j_displacement
+        self._position_displacements[i] += p_i_displacement
+        self._position_displacements[j] += p_j_displacement
         
 
         # # Interesting.  The following was auto-suggested.  
