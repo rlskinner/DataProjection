@@ -168,38 +168,28 @@ class SphereWireframeItem(pgl.GLGraphicsItem.GLGraphicsItem):
                  arc_degree_increment=5):
         super().__init__()
 
+        # Vertices for the sphere wireframe, one line strip per array
         self._sphereLines = []
-        x = np.zeros((latitude_degree_increment, longitude_degree_increment, 3), dtype=np.float32)
-        # for each longitude
-        longitude = 0
-        longitude_line = 0
-        while longitude < 360:
-            self._sphereLines.append([])
-            latitude = 0
-            while latitude <= 180:
-                x, y, z = self.Latitude_Longitude_to_XYZ(latitude, longitude)
-                self._sphereLines[longitude_line].append([x, y, z])
-                latitude += arc_degree_increment
-            
-            longitude += longitude_degree_increment
-            longitude_line += 1
 
-        
-        latitude_line = longitude_line
-        latitude = latitude_degree_increment
-        while latitude <= 180-latitude_degree_increment:
+        # for each longitude
+        sphere_line = 0
+        for longitude in range(0, 360, longitude_degree_increment):
             self._sphereLines.append([])
-            longitude = 0
-            while longitude < 360:
+            for latitude in range(0, 181, arc_degree_increment):
                 x, y, z = self.Latitude_Longitude_to_XYZ(latitude, longitude)
-                self._sphereLines[latitude_line].append([x, y, z])
-                longitude += arc_degree_increment
+                self._sphereLines[sphere_line].append([x, y, z])
+            sphere_line += 1
+        
+        # for each latitude, but skip the poles
+        for latitude in range(latitude_degree_increment, 180, latitude_degree_increment):
+            self._sphereLines.append([])
+            for longitude in range(0, 360, arc_degree_increment):
+                x, y, z = self.Latitude_Longitude_to_XYZ(latitude, longitude)
+                self._sphereLines[sphere_line].append([x, y, z])
 
             # duplicate the first point to close the Latitude loop
-            self._sphereLines[latitude_line].append(self._sphereLines[latitude_line][0])
-
-            latitude += latitude_degree_increment
-            latitude_line += 1
+            self._sphereLines[sphere_line].append(self._sphereLines[sphere_line][0])
+            sphere_line += 1
             
 
     def Latitude_Longitude_to_XYZ(self, latitude, longitude):
@@ -220,24 +210,25 @@ class SphereWireframeItem(pgl.GLGraphicsItem.GLGraphicsItem):
         ogl.glMatrixMode(ogl.GL_PROJECTION)
         ogl.glLoadMatrixf(self.projectionMatrix().data())
         
-        ogl.glColor3f(0.0, 1.0, 1.0)  # cyan color
+        render_front_and_back = False
+        if render_front_and_back:
+            ogl.glDisable(ogl.GL_CULL_FACE)
+            ogl.glLightModeli(ogl.GL_LIGHT_MODEL_TWO_SIDE, ogl.GL_TRUE)
+            ogl.glMaterialfv(ogl.GL_BACK, ogl.GL_AMBIENT_AND_DIFFUSE, [1.0, 0.0, 0.0, 1.0])
+            ogl.glMaterialfv(ogl.GL_FRONT, ogl.GL_AMBIENT_AND_DIFFUSE, [0.0, 1.0, 1.0, 1.0])
+        else:
+            ogl.glColor3f(0.0, 1.0, 1.0)  # cyan color
 
-        # Draw latitude lines
+        # Draw the lines
         for iLine in range(len(self._sphereLines)):
             ogl.glBegin(ogl.GL_LINE_STRIP)
             for iPoint in range(len(self._sphereLines[iLine])):
                 v = self._sphereLines[iLine][iPoint]
+                if render_front_and_back:
+                    ogl.glNormal3f(*v)
                 ogl.glVertex3f(*v)
             ogl.glEnd()
-
-        # Draw longitude lines
-#        for iPoint in range(self._sphereLines.shape[1]):
-#            ogl.glBegin(ogl.GL_LINE_STRIP)
-#            for i in range(self._sphereLines.shape[0]):
-#                v = self._sphereLines[i, iPoint]
-#                ogl.glVertex3f(*v)
-#            ogl.glEnd()
-        
+       
         self.update()
 
 
